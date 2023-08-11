@@ -1,0 +1,46 @@
+.LineChart {
+    display: flex;
+    flex-direction: column;
+
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 16px;
+
+    &__Row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__Title {
+        color: black;
+        font-size: 24px;
+    }
+
+    &__Title_2 {
+        color: black;
+        font-size: 24px;
+        margin: 40px 0px 16px;
+    }
+
+    &__Paragraph {
+        margin-top: 16px;
+        color: grey;
+        font-size: 16px;
+
+        mark {
+            all: unset;
+            color: black;
+            font-weight: bold;
+        }
+    }
+
+    &__Chart {
+        margin-top: 16px;
+        height: 500px;
+    }
+
+    &__LineName {
+        margin-right: 24px;
+    }
+}
