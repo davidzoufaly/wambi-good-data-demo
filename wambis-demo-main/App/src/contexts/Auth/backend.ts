@@ -1,43 +1,55 @@
 import { IAnalyticalBackend } from "@gooddata/sdk-backend-spi";
 import tigerFactory, {
-    ContextDeferredAuthProvider,
-    redirectToTigerAuthentication,
-    TigerTokenAuthProvider,
+  ContextDeferredAuthProvider,
+  redirectToTigerAuthentication,
+  TigerTokenAuthProvider,
 } from "@gooddata/sdk-backend-tiger";
 import throttle from "lodash/throttle";
 
 import { backend } from "../../constants";
 
-const throttledHandler = throttle(redirectToTigerAuthentication, 500, { leading: false, trailing: true });
+const throttledHandler = throttle(redirectToTigerAuthentication, 500, {
+  leading: false,
+  trailing: true,
+});
 
 const createBackendForDevelopment = () => {
-    if (!process.env.REACT_APP_SET_HOSTNAME && process.env.REACT_APP_DEV_TIGER_API_TOKEN) {
-        console.info(
-            "The application will use Tiger API Token for authentication and will use the proxy to send requests to the backend.",
-        );
-
-        return tigerFactory().withAuthentication(
-            new TigerTokenAuthProvider(process.env.REACT_APP_DEV_TIGER_API_TOKEN),
-        );
-    }
-
+  if (
+    !process.env.REACT_APP_SET_HOSTNAME &&
+    process.env.REACT_APP_DEV_TIGER_API_TOKEN
+  ) {
     console.info(
-        "The application will use Tiger OIDC authentication flow for authentication and will send requests directly to the backend. Please make sure your installation has correct CORS setup.",
+      "The application will use Tiger API Token for authentication and will use the proxy to send requests to the backend."
+    );
+    console.log(process.env.REACT_APP_DEV_TIGER_API_TOKEN);
+
+    const y = tigerFactory().withAuthentication(
+      new TigerTokenAuthProvider(process.env.REACT_APP_DEV_TIGER_API_TOKEN)
     );
 
-    return tigerFactory({ hostname: backend }).withAuthentication(
-        new ContextDeferredAuthProvider(throttledHandler),
-    );
+    console.log(y);
+    return y;
+  }
+
+  console.info(
+    "The application will use Tiger OIDC authentication flow for authentication and will send requests directly to the backend. Please make sure your installation has correct CORS setup."
+  );
+
+  return tigerFactory({ hostname: backend }).withAuthentication(
+    new ContextDeferredAuthProvider(throttledHandler)
+  );
 };
 
 const createBackendForProduction = () => {
-    if (!process.env.REACT_APP_SET_HOSTNAME) {
-        return tigerFactory().withAuthentication(new ContextDeferredAuthProvider(throttledHandler));
-    }
-
-    return tigerFactory({ hostname: backend }).withAuthentication(
-        new ContextDeferredAuthProvider(throttledHandler),
+  if (!process.env.REACT_APP_SET_HOSTNAME) {
+    return tigerFactory().withAuthentication(
+      new ContextDeferredAuthProvider(throttledHandler)
     );
+  }
+
+  return tigerFactory({ hostname: backend }).withAuthentication(
+    new ContextDeferredAuthProvider(throttledHandler)
+  );
 };
 
 /**
@@ -75,11 +87,11 @@ const createBackendForProduction = () => {
  * @return {IAnalyticalBackend}
  */
 export const createBackend = () => {
-    if (process.env.NODE_ENV !== "production") {
-        return createBackendForDevelopment();
-    }
+  if (process.env.NODE_ENV !== "production") {
+    return createBackendForDevelopment();
+  }
 
-    return createBackendForProduction();
+  return createBackendForProduction();
 };
 
 /**
@@ -87,6 +99,10 @@ export const createBackend = () => {
  * and it will be a 3rd party solution asking for username and password. The backend constructed in `createBackend`
  * is already setup to redirect to where the authentication flow starts.
  */
-export const backendWithCredentials = (backend: IAnalyticalBackend, _username: string, _password: string) => {
-    return backend;
+export const backendWithCredentials = (
+  backend: IAnalyticalBackend,
+  _username: string,
+  _password: string
+) => {
+  return backend;
 };
